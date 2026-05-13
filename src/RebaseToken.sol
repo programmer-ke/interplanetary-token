@@ -67,12 +67,10 @@ contract RebaseToken is ERC20, Ownable, AccessControl {
     /// @param _from The address who's tokens are being burnt
     /// @param _amount The amount of tokens to burn
     function burn(address _from, uint256 _amount) external onlyRole(MINT_AND_BURN_ROLE) {
-        uint256 currentTotalBalance = balanceOf(_from);
-
         if (_amount == type(uint256).max) {
             // Amount of type(uint256).max indicates the current total balance by convention
             // This works around the token dust problem
-            _amount = currentTotalBalance;
+            _amount = balanceOf(_from);
         }
         _mintAccruedInterest(_from);
         _burn(_from, _amount);
@@ -127,7 +125,7 @@ contract RebaseToken is ERC20, Ownable, AccessControl {
             s_userInterestRate[_recipient] = s_userInterestRate[msg.sender];
         }
 
-        super.transfer(_recipient, _amount);
+        return super.transfer(_recipient, _amount);
     }
 
     /// @notice Transfer amount on behalf of a sender to a recipient
@@ -151,7 +149,7 @@ contract RebaseToken is ERC20, Ownable, AccessControl {
             s_userInterestRate[_recipient] = s_userInterestRate[_sender];
         }
 
-        super.transferFrom(_sender, _recipient, _amount);
+        return super.transferFrom(_sender, _recipient, _amount);
     }
 
     /// @notice Returns the current balance of the account, including accrued interest

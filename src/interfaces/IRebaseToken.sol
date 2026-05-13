@@ -1,0 +1,19 @@
+// SPDX-License-Identifier: MIT
+
+pragma solidity ^0.8.33;
+
+interface IRebaseToken {
+    /// @notice Mints new tokens to the specified address
+    /// @param _to The address to mint tokens to
+    /// @param _amount The amount of tokens to mint
+    function mint(address _to, uint256 _amount) external;
+
+    /// @notice Burns tokens from the specified address
+    /// @param _from The address to burn tokens from
+    /// @param _amount The amount of tokens to burn
+    function burn(address _from, uint256 _amount) external;
+
+    /// @notice Returns a user's balance
+    /// @param _user The user who's balance to query
+    function balanceOf(address _user) external returns (uint256);
+}
