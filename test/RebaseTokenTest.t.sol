@@ -75,8 +75,8 @@ contract RebaseTokenTest is Test {
         amount = bound(amount, 1e5, type(uint96).max);
         time = bound(time, 1, type(uint96).max);
 
-        vm.startPrank(user);
         vm.deal(user, amount);
+        vm.prank(user);
 
         // user deposits
         vault.deposit{value: amount}();
@@ -89,12 +89,14 @@ contract RebaseTokenTest is Test {
 
         // ensure vault can pay additional interest
         uint256 additionalInterest = finalBalance - initialBalance;
+        vm.deal(owner, additionalInterest);
+        vm.prank(owner);
         addRewardsToVault(additionalInterest);
 
+        vm.prank(user);
         vault.redeem(type(uint256).max);
         assertEq(user.balance, amount + additionalInterest);
         assertEq(rebaseToken.balanceOf(user), 0);
-        vm.stopPrank();
     }
 
     function testTransfer(uint256 amount, uint256 amountToTransfer) public {
@@ -167,8 +169,7 @@ contract RebaseTokenTest is Test {
     }
 
     function addRewardsToVault(uint256 rewardAmount) public {
-        vm.deal(address(this), rewardAmount);
         (bool success,) = payable(address(vault)).call{value: rewardAmount}("");
-        vm.assume(success);
+        require(success, "Failed to deposit rewards!");
     }
 }
