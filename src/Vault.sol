@@ -25,6 +25,7 @@ contract Vault {
     event Redeem(address indexed user, uint256 amount);
 
     constructor(IRebaseToken _rebaseTokenAddress) {
+        require(address(_rebaseTokenAddress) != address(0), "Must not be Zero Address");
         i_rebaseToken = _rebaseTokenAddress;
     }
 
