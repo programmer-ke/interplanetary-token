@@ -5,13 +5,14 @@ pragma solidity ^0.8.33;
 import {ERC20} from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 import {AccessControl} from "@openzeppelin/contracts/access/AccessControl.sol";
+import {IRebaseToken} from "./interfaces/IRebaseToken.sol";
 
 /// @title Interplanetary Token
 /// @author Programmer KE
 /// @notice A cross chain token where users deposit into a vault and
 ///   earn interest. Interest can only decrease with time.
 ///   Users lock in the global interest rate at the time of deposit.
-contract RebaseToken is ERC20, Ownable, AccessControl {
+contract RebaseToken is IRebaseToken, ERC20, Ownable, AccessControl {
     /*//////////////////////////////////////////////////////////////
                              Errors
     //////////////////////////////////////////////////////////////*/
@@ -155,7 +156,7 @@ contract RebaseToken is ERC20, Ownable, AccessControl {
     /// @notice Returns the current balance of the account, including accrued interest
     /// @param _user The address of the account
     /// @return The total balance including interest
-    function balanceOf(address _user) public view override returns (uint256) {
+    function balanceOf(address _user) public view override(IRebaseToken, ERC20) returns (uint256) {
         uint256 principalBalance = super.balanceOf(_user);
         uint256 growthFactor = _calculateAccumulatedInterestSinceLastUpdate(_user);
         return principalBalance * growthFactor / PRECISION_FACTOR;

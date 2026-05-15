@@ -15,5 +15,5 @@ interface IRebaseToken {
 
     /// @notice Returns a user's balance
     /// @param _user The user who's balance to query
-    function balanceOf(address _user) external returns (uint256);
+    function balanceOf(address _user) external view returns (uint256);
 }
