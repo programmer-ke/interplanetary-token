@@ -167,6 +167,7 @@ contract RebaseTokenTest is Test {
     }
 
     function addRewardsToVault(uint256 rewardAmount) public {
+        vm.deal(address(this), rewardAmount);
         (bool success,) = payable(address(vault)).call{value: rewardAmount}("");
         vm.assume(success);
     }
