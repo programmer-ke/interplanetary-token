@@ -50,15 +50,15 @@ contract Vault {
     /// @notice Allows a user to burn their Rebase Token and receive a corresponding amount of ETH (1:1 peg)
     /// @param _amount The amount of tokens to burn/redeem
     function redeem(uint256 _amount) external {
-        if (_amount == 0) {
-            revert Vault__MustBeGreaterThanZero();
-        }
-
         uint256 redeemAmount = _amount;
 
         if (_amount == type(uint256).max) {
             // redeem entire balance of sender by convention
             redeemAmount = i_rebaseToken.balanceOf(msg.sender);
+        }
+
+        if (redeemAmount == 0) {
+            revert Vault__MustBeGreaterThanZero();
         }
 
         emit Redeem(msg.sender, redeemAmount);
