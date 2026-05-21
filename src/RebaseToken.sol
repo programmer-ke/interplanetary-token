@@ -56,7 +56,10 @@ contract RebaseToken is IRebaseToken, ERC20, Ownable, AccessControl {
     /// @param _to The address to mint tokens to
     /// @param _amount The principal amount of tokens to mint
     /// @dev Also mints accrued interest and locks current global interest to the user
-    function mint(address _to, uint256 _amount, uint256 _interestRate) external onlyRole(MINT_AND_BURN_ROLE) {
+    function mint(address _to, uint256 _amount, uint256 _interestRate)
+        external
+        onlyRole(MINT_AND_BURN_ROLE)
+    {
         _mintAccruedInterest(_to);
         s_userInterestRate[_to] = _interestRate;
         _mint(_to, _amount);
@@ -137,7 +140,11 @@ contract RebaseToken is IRebaseToken, ERC20, Ownable, AccessControl {
     /// @param _sender The address authorizing the transfer of funds
     /// @param _recipient The address receiving the funds
     /// @param _amount The amount to transfer
-    function transferFrom(address _sender, address _recipient, uint256 _amount) public override returns (bool) {
+    function transferFrom(address _sender, address _recipient, uint256 _amount)
+        public
+        override
+        returns (bool)
+    {
         _mintAccruedInterest(_sender);
         _mintAccruedInterest(_recipient);
 
@@ -188,7 +195,11 @@ contract RebaseToken is IRebaseToken, ERC20, Ownable, AccessControl {
     /// @dev Calculates growth factor due to accumulated interest since users' last update
     /// @param _user The address of the user
     /// @return Growth factor scaled by precision e.g. 1.05x growth is 1.05 * 1e18
-    function _calculateAccumulatedInterestSinceLastUpdate(address _user) private view returns (uint256) {
+    function _calculateAccumulatedInterestSinceLastUpdate(address _user)
+        private
+        view
+        returns (uint256)
+    {
         uint256 timeElapsed = block.timestamp - s_userLastUpdatedTimestamp[_user];
 
         if (timeElapsed == 0 || s_userInterestRate[_user] == 0) {

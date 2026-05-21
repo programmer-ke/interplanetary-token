@@ -50,7 +50,9 @@ contract RebaseTokenTest is Test {
         uint256 interestAfterSecondWarp = balanceAfterSecondWarp - balanceAfterFirstWarp;
 
         assertEq(initialBalance, amount);
-        assertApproxEqAbs(interestAfterFirstWarp, interestAfterSecondWarp, 1, "Interest Accrual Is Not Linear");
+        assertApproxEqAbs(
+            interestAfterFirstWarp, interestAfterSecondWarp, 1, "Interest Accrual Is Not Linear"
+        );
 
         vm.stopPrank();
     }
