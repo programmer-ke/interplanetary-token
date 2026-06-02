@@ -20,7 +20,7 @@ import {TokenPool} from "@ccip/contracts/pools/TokenPool.sol";
 contract CrossChainTest is Test {
     uint256 sepoliaFork;
     uint256 arbSepoliaFork;
-    CCIPLocalSimulatorFork ccipLocalSimulatorfork;
+    CCIPLocalSimulatorFork ccipLocalSimulatorFork;
 
     RebaseToken sepoliaToken;
     RebaseToken arbSepoliaToken;
@@ -38,14 +38,14 @@ contract CrossChainTest is Test {
     function setUp() public {
         sepoliaFork = vm.createSelectFork("sepolia");
         arbSepoliaFork = vm.createFork("arb-sepolia");
-        ccipLocalSimulatorfork = new CCIPLocalSimulatorFork();
-        vm.makePersistent(address(ccipLocalSimulatorfork));
+        ccipLocalSimulatorFork = new CCIPLocalSimulatorFork();
+        vm.makePersistent(address(ccipLocalSimulatorFork));
 
         // deploy in sepolia fork
         vm.startPrank(owner);
         sepoliaToken = new RebaseToken();
         vault = new Vault(IRebaseToken(address(sepoliaToken)));
-        sepoliaNetworkDetails = ccipLocalSimulatorfork.getNetworkDetails(block.chainid);
+        sepoliaNetworkDetails = ccipLocalSimulatorFork.getNetworkDetails(block.chainid);
         sepoliaPool = new RebaseTokenPool(
             IERC20(address(sepoliaToken)),
             new address[](0),
@@ -66,7 +66,7 @@ contract CrossChainTest is Test {
         vm.selectFork(arbSepoliaFork);
         vm.startPrank(owner);
         arbSepoliaToken = new RebaseToken();
-        arbSepoliaNetworkDetails = ccipLocalSimulatorfork.getNetworkDetails(block.chainid);
+        arbSepoliaNetworkDetails = ccipLocalSimulatorFork.getNetworkDetails(block.chainid);
         arbSepoliaPool = new RebaseTokenPool(
             IERC20(address(arbSepoliaToken)),
             new address[](0),
