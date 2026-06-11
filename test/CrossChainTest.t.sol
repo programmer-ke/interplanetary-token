@@ -151,84 +151,86 @@ contract CrossChainTest is Test {
         TokenPool(localPoolAddress).applyChainUpdates(remoteChainSelectorsToRemove, chainsToAdd);
     }
 
-    function bridgeTokens(
-        address user,
-        uint256 amountToBridge,
-        uint256 localFork,
-        uint256 remoteFork,
-        Register.NetworkDetails memory localNetworkDetails,
-        Register.NetworkDetails memory remoteNetworkDetails,
-        RebaseToken localToken,
-        RebaseToken remoteToken
-    ) public {
-        vm.selectFork(localFork);
+    struct BridgeParams {
+        address user;
+        uint256 amountToBridge;
+        uint256 localFork;
+        uint256 remoteFork;
+        Register.NetworkDetails localNetworkDetails;
+        Register.NetworkDetails remoteNetworkDetails;
+        RebaseToken localToken;
+        RebaseToken remoteToken;
+    }
+
+    function bridgeTokens(BridgeParams memory p) public {
+        vm.selectFork(p.localFork);
 
         // create token amounts
         Client.EVMTokenAmount[] memory tokenAmounts = new Client.EVMTokenAmount[](1);
         tokenAmounts[0] =
-            Client.EVMTokenAmount({token: address(localToken), amount: amountToBridge});
+            Client.EVMTokenAmount({token: address(p.localToken), amount: p.amountToBridge});
 
         // construct cross chain message
         Client.EVM2AnyMessage memory message = Client.EVM2AnyMessage({
-            receiver: abi.encode(user),
+            receiver: abi.encode(p.user),
             data: "", // no additional data to send
             tokenAmounts: tokenAmounts,
-            feeToken: localNetworkDetails.linkAddress,
-            extraArgs: Client._argsToBytes(Client.EVMExtraArgsV1({gasLimit: 500_000})) // use default gas limit
+            feeToken: p.localNetworkDetails.linkAddress,
+            extraArgs: Client._argsToBytes(Client.EVMExtraArgsV1({gasLimit: 500_000}))
         });
 
         // fund user with transfer fee
-        uint256 fee = IRouterClient(localNetworkDetails.routerAddress)
-            .getFee(remoteNetworkDetails.chainSelector, message);
+        uint256 fee = IRouterClient(p.localNetworkDetails.routerAddress)
+            .getFee(p.remoteNetworkDetails.chainSelector, message);
 
         console.log("fee", fee);
 
-        ccipLocalSimulatorFork.requestLinkFromFaucet(user, fee);
+        ccipLocalSimulatorFork.requestLinkFromFaucet(p.user, fee);
 
         // approve router to spend LINK fee
-        vm.prank(user);
-        IERC20(localNetworkDetails.linkAddress).approve(localNetworkDetails.routerAddress, fee);
+        vm.prank(p.user);
+        IERC20(p.localNetworkDetails.linkAddress).approve(p.localNetworkDetails.routerAddress, fee);
 
         // approve router to tranfer the amount to bridge
-        vm.prank(user);
-        IERC20(address(localToken)).approve(localNetworkDetails.routerAddress, amountToBridge);
+        vm.prank(p.user);
+        IERC20(address(p.localToken)).approve(p.localNetworkDetails.routerAddress, p.amountToBridge);
 
         // bridge token
-        uint256 localInterestRate = localToken.getUserInterestRate(user);
-        uint256 localBalanceBefore = localToken.balanceOf(user);
+        uint256 localInterestRate = p.localToken.getUserInterestRate(p.user);
+        uint256 localBalanceBefore = p.localToken.balanceOf(p.user);
 
         console.log("localInterestRate", localInterestRate);
         console.log("localBalanceBefore", localBalanceBefore);
 
-        vm.prank(user);
-        IRouterClient(localNetworkDetails.routerAddress)
-            .ccipSend(remoteNetworkDetails.chainSelector, message);
+        vm.prank(p.user);
+        IRouterClient(p.localNetworkDetails.routerAddress)
+            .ccipSend(p.remoteNetworkDetails.chainSelector, message);
 
-        uint256 localBalanceAfter = localToken.balanceOf(user);
+        uint256 localBalanceAfter = p.localToken.balanceOf(p.user);
         assertEq(
             localBalanceBefore - localBalanceAfter,
-            amountToBridge,
+            p.amountToBridge,
             "Local balance incorrect after change"
         );
 
         // check initial remote balance
-        vm.selectFork(remoteFork);
+        vm.selectFork(p.remoteFork);
         vm.warp(block.timestamp + 20 minutes);
-        uint256 remoteBalanceBefore = remoteToken.balanceOf(user);
+        uint256 remoteBalanceBefore = p.remoteToken.balanceOf(p.user);
         console.log("remoteBalanceBefore", remoteBalanceBefore);
 
         // Switch back to local fork and route message
-        vm.selectFork(localFork);
-        ccipLocalSimulatorFork.switchChainAndRouteMessage(remoteFork);
+        vm.selectFork(p.localFork);
+        ccipLocalSimulatorFork.switchChainAndRouteMessage(p.remoteFork);
 
-        vm.selectFork(remoteFork);
-        uint256 remoteBalanceAfter = remoteToken.balanceOf(user);
-        uint256 remoteInterestRate = remoteToken.getUserInterestRate(user);
+        vm.selectFork(p.remoteFork);
+        uint256 remoteBalanceAfter = p.remoteToken.balanceOf(p.user);
+        uint256 remoteInterestRate = p.remoteToken.getUserInterestRate(p.user);
 
         console.log("remoteBalanceAfter", remoteBalanceAfter);
         console.log("remoteInterestRate", remoteInterestRate);
 
-        assertEq(remoteBalanceAfter, remoteBalanceBefore + amountToBridge);
+        assertEq(remoteBalanceAfter, remoteBalanceBefore + p.amountToBridge);
         assertEq(localInterestRate, remoteInterestRate, "Interest Rates do not match");
     }
 
@@ -244,14 +246,16 @@ contract CrossChainTest is Test {
 
         // Bridge tokens: sepolia -> arb sepolia
         bridgeTokens(
-            user,
-            DEPOSIT_AMOUNT,
-            sepoliaFork,
-            arbSepoliaFork,
-            sepoliaNetworkDetails,
-            arbSepoliaNetworkDetails,
-            sepoliaToken,
-            arbSepoliaToken
+            BridgeParams({
+                user: user,
+                amountToBridge: DEPOSIT_AMOUNT,
+                localFork: sepoliaFork,
+                remoteFork: arbSepoliaFork,
+                localNetworkDetails: sepoliaNetworkDetails,
+                remoteNetworkDetails: arbSepoliaNetworkDetails,
+                localToken: sepoliaToken,
+                remoteToken: arbSepoliaToken
+            })
         );
 
         // Bridge tokens in reverse.
@@ -260,14 +264,16 @@ contract CrossChainTest is Test {
         assertTrue(arbBalance > 0);
 
         bridgeTokens(
-            user,
-            arbBalance,
-            arbSepoliaFork,
-            sepoliaFork,
-            arbSepoliaNetworkDetails,
-            sepoliaNetworkDetails,
-            arbSepoliaToken,
-            sepoliaToken
+            BridgeParams({
+                user: user,
+                amountToBridge: arbBalance,
+                localFork: arbSepoliaFork,
+                remoteFork: sepoliaFork,
+                localNetworkDetails: arbSepoliaNetworkDetails,
+                remoteNetworkDetails: sepoliaNetworkDetails,
+                localToken: arbSepoliaToken,
+                remoteToken: sepoliaToken
+            })
         );
 
         vm.selectFork(sepoliaFork);
