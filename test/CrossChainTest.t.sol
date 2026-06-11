@@ -174,7 +174,7 @@ contract CrossChainTest is Test {
             data: "", // no additional data to send
             tokenAmounts: tokenAmounts,
             feeToken: localNetworkDetails.linkAddress,
-            extraArgs: Client._argsToBytes(Client.EVMExtraArgsV1({gasLimit: 500_000})) // use default gas limit
+            extraArgs: Client._argsToBytes(Client.EVMExtraArgsV1({gasLimit: 500_000}))
         });
 
         // fund user with transfer fee

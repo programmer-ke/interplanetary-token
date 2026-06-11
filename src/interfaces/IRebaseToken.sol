@@ -24,4 +24,8 @@ interface IRebaseToken {
     /// @notice Gets the global interest rate
     /// @return The global interest rate
     function getInterestRate() external view returns (uint256);
+
+    /// @notice grant an account mint and burn role
+    /// @param _account The account to grant role
+    function grantMintAndBurnRole(address _account) external;
 }
