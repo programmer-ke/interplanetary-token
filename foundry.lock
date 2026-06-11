@@ -1,20 +1,17 @@
 {
   "lib/chainlink-ccip": {
     "tag": {
-      "name": "contracts-ccip-v1.6.4",
-      "rev": "bccdd15b734ea6c0e6d1b3d36c482e64ced2d441"
+      "name": "contracts-ccip-v1.6.2",
+      "rev": "0e3e0fc5c0f70f0d50dca66b139142ddf3009294"
     }
   },
   "lib/chainlink-evm": {
-    "tag": {
-      "name": "v0.3.3",
-      "rev": "793106cd598da8b2762958880300787b0b361fa1"
-    }
+    "rev": "86aa5a1d34b20eda8d18fe6eb0e4882948e545ba"
   },
   "lib/chainlink-local": {
     "tag": {
-      "name": "v0.2.7",
-      "rev": "a3ace4e17336e84c4d1261f2da45d5e8963af714"
+      "name": "v0.2.9",
+      "rev": "f8c0efe8685660dac07e08f4558f1b578ae991aa"
     }
   },
   "lib/forge-std": {
