@@ -50,7 +50,9 @@ contract RebaseTokenTest is Test {
         uint256 interestAfterSecondWarp = balanceAfterSecondWarp - balanceAfterFirstWarp;
 
         assertEq(initialBalance, amount);
-        assertApproxEqAbs(interestAfterFirstWarp, interestAfterSecondWarp, 1, "Interest Accrual Is Not Linear");
+        assertApproxEqAbs(
+            interestAfterFirstWarp, interestAfterSecondWarp, 1, "Interest Accrual Is Not Linear"
+        );
 
         vm.stopPrank();
     }
@@ -159,9 +161,10 @@ contract RebaseTokenTest is Test {
     }
 
     function testUnauthorizedCannotCallMintAndBurn() public {
+        uint256 interestRate = rebaseToken.getInterestRate();
         vm.prank(user);
         vm.expectPartialRevert(IAccessControl.AccessControlUnauthorizedAccount.selector);
-        rebaseToken.mint(user, 1 ether);
+        rebaseToken.mint(user, 1 ether, interestRate);
 
         vm.prank(user);
         vm.expectPartialRevert(IAccessControl.AccessControlUnauthorizedAccount.selector);

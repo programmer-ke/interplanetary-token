@@ -43,8 +43,8 @@ contract Vault {
             revert Vault__MustBeGreaterThanZero();
         }
         emit Deposit(msg.sender, amountToMint);
-
-        i_rebaseToken.mint(msg.sender, amountToMint);
+        uint256 interestRate = i_rebaseToken.getInterestRate();
+        i_rebaseToken.mint(msg.sender, amountToMint, interestRate);
     }
 
     /// @notice Allows a user to burn their Rebase Token and receive a corresponding amount of ETH (1:1 peg)
