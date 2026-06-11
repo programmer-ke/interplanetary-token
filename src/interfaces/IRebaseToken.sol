@@ -21,7 +21,7 @@ interface IRebaseToken {
     /// @param _user The user who's interest rate we're querying
     function getUserInterestRate(address _user) external view returns (uint256);
 
-    /// @notice Get's the global interest rate
+    /// @notice Gets the global interest rate
     /// @return The global interest rate
     function getInterestRate() external view returns (uint256);
 }
