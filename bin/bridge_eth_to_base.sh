@@ -84,8 +84,8 @@ echo "Configuring the pool on base Sepolia..."
 #        uint128 inboundRateLimiterCapacity
 forge script ./script/ConfigurePool.s.sol:ConfigurePool --rpc-url ${BASE_SEPOLIA_RPC_URL} --account ${ACCOUNT} --broadcast --sig "run(address,uint64,address,address,bool,uint128,uint128,bool,uint128,uint128)" ${BASE_SEPOLIA_POOL_ADDRESS} ${SEPOLIA_CHAIN_SELECTOR} ${SEPOLIA_POOL_ADDRESS} ${SEPOLIA_REBASE_TOKEN_ADDRESS} false 0 0 false 0 0
 
-# Bridge the funds using the script to zksync 
-echo "Bridging the funds using the script to Base..."
+# Bridge the funds using the script to Base Sepolia 
+echo "Bridging the funds using the script to Base Sepolia..."
 SEPOLIA_BALANCE_BEFORE=$(cast balance $(cast wallet address --account ${ACCOUNT}) --erc20 ${SEPOLIA_REBASE_TOKEN_ADDRESS} --rpc-url ${SEPOLIA_RPC_URL})
 echo "Sepolia balance before bridging: $SEPOLIA_BALANCE_BEFORE"
 forge script ./script/BridgeTokens.s.sol:BridgeTokenScript --rpc-url ${SEPOLIA_RPC_URL} --account ${ACCOUNT} --broadcast --sig "run(address,uint64,address,uint256,address,address)" $(cast wallet address --account ${ACCOUNT}) ${BASE_SEPOLIA_CHAIN_SELECTOR} ${SEPOLIA_REBASE_TOKEN_ADDRESS} ${AMOUNT} ${SEPOLIA_LINK_ADDRESS} ${SEPOLIA_ROUTER}

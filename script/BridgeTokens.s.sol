@@ -16,6 +16,7 @@ contract BridgeTokenScript is Script {
         address linkTokenAddress,
         address routerAddress
     ) public {
+        // Bridge token to remote chain
         vm.startBroadcast();
 
         Client.EVMTokenAmount[] memory tokenAmounts = new Client.EVMTokenAmount[](1);
@@ -34,10 +35,12 @@ contract BridgeTokenScript is Script {
         // fund user with transfer fee
         uint256 fee = IRouterClient(routerAddress).getFee(destinationChainSelector, message);
 
-        // approve spending fees and bridge amounts
+        // approve router to spend Link on msg.sender's behalf
         IERC20(linkTokenAddress).approve(routerAddress, fee);
 
+        // approve router to spend msg.senders tokens
         IERC20(address(tokenToSendAddress)).approve(routerAddress, amountToSend);
+
         IRouterClient(routerAddress).ccipSend(destinationChainSelector, message);
 
         vm.stopBroadcast();

@@ -19,6 +19,12 @@ contract ConfigurePool is Script {
         uint128 inboundRateLimiterRate,
         uint128 inboundRateLimiterCapacity
     ) public {
+        // Configure the local pool with remote chain parameters
+        // - chain selector
+        // - remote pool
+        // - remote token
+        // - rate limits
+        // This enables bridging to remote chain
         vm.startBroadcast();
         bytes[] memory remotePoolAddresses = new bytes[](1);
         remotePoolAddresses[0] = abi.encode(remotePool);

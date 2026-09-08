@@ -57,8 +57,22 @@ $ anvil
 
 ### Deploy
 
+Deploy token and token pool.
+
 ```shell
-$ forge script script/Counter.s.sol:CounterScript --rpc-url <your_rpc_url> --private-key <your_private_key>
+$ forge script script/Deployer.s.sol:TokenAndPoolDeployer --rpc-url ${RPC_URL} --account ${ACCOUNT} --broadcast
+```
+
+Deploy vault.
+
+```shell
+$ forge script ./script/Deployer.s.sol:VaultDeployer --rpc-url ${RPC_URL} --account ${ACCOUNT} --broadcast --sig "run(address)" ${REBASE_TOKEN_ADDRESS}
+```
+
+Configure pool to allow bridging
+
+```shell
+$ forge script ./script/ConfigurePool.s.sol:ConfigurePool --rpc-url ${RPC_URL} --account ${ACCOUNT} --broadcast --sig "run(address,uint64,address,address,bool,uint128,uint128,bool,uint128,uint128)" ${LOCAL_POOL_ADDRESS} ${REMOTE_CHAIN_SELECTOR} ${REMOTE_POOL_ADDRESS} ${REMOTE_REBASE_TOKEN_ADDRESS} false 0 0 false 0 0
 ```
 
 ### Cast

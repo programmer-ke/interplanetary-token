@@ -36,6 +36,7 @@ contract TokenAndPoolDeployer is Script {
         token.grantMintAndBurnRole(address(pool));
 
         // register pool
+        // the token owner (msg.sender) becomes the admin
         RegistryModuleOwnerCustom(networkDetails.registryModuleOwnerCustomAddress)
             .registerAdminViaOwner(address(token));
         TokenAdminRegistry(networkDetails.tokenAdminRegistryAddress).acceptAdminRole(address(token));
@@ -49,6 +50,7 @@ contract TokenAndPoolDeployer is Script {
 contract VaultDeployer is Script {
     function run(address _rebaseToken) public returns (Vault vault) {
         vm.startBroadcast();
+        // deploy vault and grant it permissions on token
         vault = new Vault(IRebaseToken(_rebaseToken));
         IRebaseToken(_rebaseToken).grantMintAndBurnRole(address(vault));
         vm.stopBroadcast();
