@@ -29,7 +29,7 @@ contract BridgeTokenScript is Script {
             data: "", // no additional data to send
             tokenAmounts: tokenAmounts,
             feeToken: linkTokenAddress,
-            extraArgs: Client._argsToBytes(Client.EVMExtraArgsV1({gasLimit: 0}))
+            extraArgs: Client._argsToBytes(Client.EVMExtraArgsV1({gasLimit: 500_000}))
         });
 
         // fund user with transfer fee
