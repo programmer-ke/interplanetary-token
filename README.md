@@ -23,6 +23,10 @@ tokens representing their share of funds within the vault.
   deposit as a snapshot of the global interest rate at the time of
   deposit.
 
+### Bridging
+
+See [how bridging works](how_bridging_works.md)
+
 ## Development
 
 ### Build
